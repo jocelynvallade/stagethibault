@@ -1,0 +1,29 @@
+﻿@page "/test"
+@using Radzen
+@using Radzen.Blazor
+@using Microsoft.AspNetCore.Components.Authorization;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavManager
+@inject Services.AppData AppData;
+
+<h1>Hello, world @Credentials</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+<RadzenLogin AllowResetPassword="false" ResetPasswordText="Forgot password" AllowRegister="false" AutoComplete="false"
+             Login="@(args=>OnLogin(args))">
+</RadzenLogin>
+
+@code
+{ private String Credentials = "";
+            public bool CanLogin = false;
+            async void OnLogin(LoginArgs LogCredentials)
+            {
+                Credentials = LogCredentials.Username + " " + LogCredentials.Password;
+                await localStorage.SetItemAsync<string>("username", LogCredentials.Username);
+                await AuthProvider.GetAuthenticationStateAsync();
+                AppData.CanLogin = true;
+                NavManager.NavigateTo("", true);
+            } }

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.7" PrivateAssets="all" />
+    <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="5.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.7" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.1.2" />
+    <PackageReference Include="Radzen.Blazor" Version="3.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Microsoft.AspNetCore.Components" />
+    <None Remove="Microsoft.AspNetCore.Components.Authorization" />
+    <None Remove="Blazored.LocalStorage" />
+    <None Remove="Radzen.Blazor" />
+  </ItemGroup>
+</Project>

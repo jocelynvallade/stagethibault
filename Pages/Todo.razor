@@ -1,0 +1,38 @@
+﻿@page "/Todo"
+
+<h1>Je suis</h1>
+<h3>la 'todo' liste</h3>
+
+
+@foreach (var task in Jobs)
+{
+    <p>@task.Description - <strong>@task.Status</strong></p>
+}
+
+@code {
+
+    public class JobModel
+    {
+        public int Id { get; set; }
+        public JobStatuses Status { get; set; }
+        public string Description { get; set; }
+        public DateTime LastUpdated { get; set; }
+    }
+
+    public enum JobStatuses
+    {
+        Fait,
+        EnCours,
+        AFaire
+    }
+
+    List<JobModel> Jobs = new List<JobModel>();
+    protected override void OnInitialized()
+    {
+        Jobs.Add(new JobModel { Id = 1, Description = "Sortir le chien", Status = JobStatuses.AFaire, LastUpdated = DateTime.Now });
+        Jobs.Add(new JobModel { Id = 2, Description = "Nourrir le chat", Status = JobStatuses.Fait, LastUpdated = DateTime.Now });
+        Jobs.Add(new JobModel { Id = 3, Description = "Piquer le hérisson", Status = JobStatuses.AFaire, LastUpdated = DateTime.Now });
+        Jobs.Add(new JobModel { Id = 4, Description = "Peigner la girafe", Status = JobStatuses.EnCours, LastUpdated = DateTime.Now });
+        Jobs.Add(new JobModel { Id = 5, Description = "Vacciner les pangolins", Status = JobStatuses.EnCours, LastUpdated = DateTime.Now });
+    }
+}
