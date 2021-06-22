@@ -10,21 +10,15 @@
 
 @using System.Text.Json;
 @inject NavigationManager NavManager
-<h3>Bienvenue</h3>
 
 <div class="back">
     <div class="container">
         <div class="box">
-            
-
             Nom:
             <input class="name" type="text" placeholder="Nom" @bind="AppData.Username" />
 
-
             Mot de passe:
             <input class="pass" type="password" placeholder="Mot de passe" @bind="@password" />
-
-
 
             <button class="btn btn-primary" @onclick="TryLogin">Se connecter</button>
             <span class="text-danger">@loginErrorMessage</span>
@@ -67,7 +61,7 @@
            AppData.CanLogin = true;
             await localStorage.SetItemAsync<string>("username", result.Nom);
             await AuthProvider.GetAuthenticationStateAsync();
-            NavManager.NavigateTo("Todo", false);
+            NavManager.NavigateTo("Pieces", false);
         }
         else
             loginErrorMessage = "Mot de passe incorrect ";

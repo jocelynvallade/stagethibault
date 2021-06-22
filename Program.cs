@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 namespace loginProjet
 {
     public class Program
@@ -19,6 +20,13 @@ namespace loginProjet
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+            //builder.Services.AddSingleton<Services.AppData>();
+            builder.Services.AddScoped<Services.AppData>();
+            builder.Services.AddTransient<Services.BlazorTimer>();
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddOptions();
+            builder.Services.AddAuthorizationCore();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
             await builder.Build().RunAsync();
         }
     }

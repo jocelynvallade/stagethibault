@@ -1,0 +1,162 @@
+﻿@page "/js"
+@inject IJSRuntime JS;
+@using Blazor.Extensions;
+@using Blazor.Extensions.Canvas
+@using Blazor.Extensions.Canvas.Canvas2D;
+
+<h3>Component1</h3>
+<BECanvas Width="300" Height="400" @ref="_canvasReference"></BECanvas>
+
+<p>
+    <button @onclick="ConvertArray">Convert Array</button>
+</p>
+<p>
+    <button @onclick="ConvertExternal">Convert Exterbe</button>
+</p>
+<p>
+    @text
+</p>
+
+<BECanvas Width="500" Height="500" @ref="_canvasclock"></BECanvas>
+
+
+@code {
+
+    private Canvas2DContext _context;
+    private Canvas2DContext _contextclock;
+    protected BECanvasComponent _canvasReference;
+    protected BECanvasComponent _canvasclock;
+    private MarkupString text;
+
+    private double radius;
+    private uint[] quoteArray =
+        new uint[]
+        {
+            65, 101, 109, 62, 67, 97, 110, 39, 116, 32, 115, 116, 111, 112, 32,
+            116, 104, 101, 32, 115, 105, 103, 110, 97, 108, 44, 32, 77, 97,
+            108, 46, 60, 47, 101, 109, 62, 32, 45, 32, 77, 114, 46, 32, 85, 110,
+            105, 118, 101, 114, 115, 101, 10, 10,
+            };
+
+    private async Task ConvertArray()
+    {
+        text = new(await JS.InvokeAsync<string>("convertArray", quoteArray));
+    }
+    private async Task ConvertExternal()
+    {
+        int a = 2;
+        int b = 3;
+        b=  await JS.InvokeAsync<int>("myFunction", a, b);
+        text = (MarkupString)b.ToString();
+        //text = new(await JS.InvokeAsync<string>("myFunction", a, b));
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        this._context = await this._canvasReference.CreateCanvas2DAsync();
+        await this._context.SetFillStyleAsync("red");
+
+        await this._context.FillRectAsync(10, 100, 100, 100);
+
+        await this._context.SetFontAsync("38px Calibri");
+        await this._context.StrokeTextAsync("Hello Blazor!!!", 5, 100);
+
+        this._contextclock = await this._canvasclock.CreateCanvas2DAsync();
+        await this._contextclock.SetFillStyleAsync("red");
+
+        await this._contextclock.FillRectAsync(400, 400, 300, 100);
+
+        await this._contextclock.SetFontAsync("38px Calibri");
+        await this._contextclock.StrokeTextAsync("Hello world!!!", 5, 100);
+
+
+        radius = _canvasclock.Height / 2;
+        await _contextclock.TranslateAsync(radius, radius);
+        radius = radius * 0.90;
+        System.Timers.Timer montimer = new System.Timers.Timer(); // Initialise mon compteur
+        montimer.Interval = 1000; // Interval en milliseconde 
+        montimer.Start(); // Lance Mon compteur
+        montimer.Elapsed += AfficherPendule;
+
+
+    }
+    void AfficherPendule(Object source, System.Timers.ElapsedEventArgs e)
+    {
+
+        dessinerCadre();
+        dessinerChiffres();
+        //dessinerHeure(_contextclock, radius);
+
+    }
+
+    void dessinerCadre()
+    {
+        _contextclock.BeginPathAsync();
+        _contextclock.ArcAsync(0, 0, radius, 0, 2 * Math.PI);
+        _contextclock.SetFillStyleAsync ("white");
+        _contextclock.FillAsync();
+        float Lw = ((float)(radius * 0.1));
+        _contextclock.SetLineWidthAsync (Lw);
+        _contextclock.StrokeAsync();
+        _contextclock.BeginPathAsync();
+        _contextclock.ArcAsync(0, 0, radius * 0.1, 0, 2 * Math.PI);
+        _contextclock.SetFillStyleAsync ("#B40404");
+        _contextclock.FillAsync();
+    }
+
+    void dessinerChiffres()
+    {
+        float ang;
+        _contextclock.SetFontAsync(radius * 0.15 + "px arial");
+        //_contextclock.SetTextAlignAsync("middle");
+
+        // TextAlign LeTexteAlign("center");
+        // _contextclock.SetTextAlignAsync(LeTexteAlign);
+        for (float num = 1; num < 13; num++)
+        {
+            ang = (float)(num * Math.PI / 6);
+            _contextclock.Rotate(ang);
+            _contextclock.Translate(0, -radius * 0.85);
+            _contextclock.Rotate(-ang);
+            _contextclock.FillTextAsync(num.ToString(), 0, 0);
+            _contextclock.Rotate(ang);
+            _contextclock.Translate(0, radius * 0.85);
+            _contextclock.Rotate(-ang);
+        }
+    }
+    void dessinerHeure()
+    {
+        DateTime now = new DateTime();
+        double hour = now.Hour;
+        double minute = now.Minute;
+        double second = now.Second;
+        //heures
+        hour = hour % 12;
+        hour = (hour * Math.PI / 6) +
+            (minute * Math.PI / (6 * 60)) +
+            (second * Math.PI / (360 * 60));
+        dessinerAiguille( hour, radius * 0.5, radius * 0.07);
+        //minutes
+        minute = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
+        dessinerAiguille( minute, radius * 0.8, radius * 0.07);
+        // secondes
+        second = (second * Math.PI / 30);
+        dessinerAiguille( second, radius * 0.9, radius * 0.02);
+    }
+
+
+    void dessinerAiguille( double pos, double length, double width)
+    {
+        _contextclock.BeginPathAsync();
+        _contextclock.SetLineWidthAsync((float)width);
+        //LineCap MyCap = new LineCap();
+        //_contextclock.SetLineCapAsync ("round");
+        _contextclock.MoveToAsync(0, 0);
+        _contextclock.RotateAsync((float)pos);
+        _contextclock.LineToAsync(0, -length);
+        _contextclock.StrokeAsync();
+        _contextclock.RotateAsync((float)-pos);
+    }
+
+}

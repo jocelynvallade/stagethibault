@@ -1,13 +1,17 @@
-﻿@page "/Todo"
+﻿@using Services;
+@page "/Todo"
+@inject Services.AppData AppData;
 
-<h1>Je suis</h1>
-<h3>la 'todo' liste</h3>
 
+
+<h3>Je suis la 'todo' liste de @AppData.Username</h3>
 
 @foreach (var task in Jobs)
 {
     <p>@task.Description - <strong>@task.Status</strong></p>
 }
+
+
 
 @code {
 
@@ -29,6 +33,7 @@
     List<JobModel> Jobs = new List<JobModel>();
     protected override void OnInitialized()
     {
+        AppData.OnChange += StateHasChanged;
         Jobs.Add(new JobModel { Id = 1, Description = "Sortir le chien", Status = JobStatuses.AFaire, LastUpdated = DateTime.Now });
         Jobs.Add(new JobModel { Id = 2, Description = "Nourrir le chat", Status = JobStatuses.Fait, LastUpdated = DateTime.Now });
         Jobs.Add(new JobModel { Id = 3, Description = "Piquer le hérisson", Status = JobStatuses.AFaire, LastUpdated = DateTime.Now });

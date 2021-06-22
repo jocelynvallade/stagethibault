@@ -1,0 +1,113 @@
+﻿@using System.Threading;
+@page "/Clock"
+@inject IJSRuntime JS;
+@inject Services.BlazorTimer Timer
+<div class="container">
+    <div class="clock">
+        <div class="clock__item clock__year">
+            <div @ref=ReferenceToClockYear1 class="clock__year--item clock__year--01"></div>
+            <div @ref=ReferenceToClockYear2 class="clock__year--item clock__year--02"></div>
+            <div @ref=ReferenceToClockYear3 class="clock__year--item clock__year--03"></div>
+            <div @ref=ReferenceToClockYear4 class="clock__year--item clock__year--04"></div>
+            <div class="clock__year--item clock__year--05"></div>
+            <div class="clock__year--item clock__year--06"></div>
+            <div class="clock__year--item clock__year--07"></div>
+            <div class="clock__year--item clock__year--08"></div>
+        </div>
+        <div class="clock__item clock__month">
+            <div @ref=ReferenceToClockMonth1 class="clock__month--item clock__month--01"></div>
+            <div @ref=ReferenceToClockMonth2 class="clock__month--item clock__month--02"></div>
+            <div @ref=ReferenceToClockMonth3 class="clock__month--item clock__month--03"></div>
+            <div class="clock__month--item clock__month--04"></div>
+            <div class="clock__month--item clock__month--05"></div>
+            <div class="clock__month--item clock__month--06"></div>
+        </div>
+        <div class="clock__item clock__day-numbers">
+            <div @ref=ReferenceToClockDayNumber1 class="clock__day-numbers--item clock__day-numbers--01"></div>
+            <div @ref=ReferenceToClockDayNumber2 class="clock__day-numbers--item clock__day-numbers--02"></div>
+            <div class="clock__day-numbers--item clock__day-numbers--03"></div>
+            <div class="clock__day-numbers--item clock__day-numbers--04"></div>
+        </div>
+        <div class="clock__item clock__day-letters">
+            <div @ref=ReferenceToClockDayLetter1 class="clock__day-letters--item clock__day-letters--01"></div>
+            <div @ref=ReferenceToClockDayLetter2 class="clock__day-letters--item clock__day-letters--02"></div>
+            <div @ref=ReferenceToClockDayLetter3 class="clock__day-letters--item clock__day-letters--03"></div>
+            <div class="clock__day-letters--item clock__day-letters--04"></div>
+            <div class="clock__day-letters--item clock__day-letters--05"></div>
+            <div class="clock__day-letters--item clock__day-letters--06"></div>
+        </div>
+        <div class="clock__item clock__analog">
+            <div @ref=ReferenceToClockAnalogHours class="clock__analog--hours"></div>
+            <div @ref=ReferenceToClockAnalogMinutes class="clock__analog--minutes"></div>
+            <div @ref=ReferenceToClockAnalogSeconds class="clock__analog--seconds"></div>
+        </div>
+    </div>
+</div>
+@text
+@code {
+    String text;
+    [Parameter]
+    public ElementReference ReferenceToClockAnalogSeconds { get; set; }
+    public ElementReference ReferenceToClockAnalogMinutes { get; set; }
+    public ElementReference ReferenceToClockAnalogHours { get; set; }
+    public ElementReference ReferenceToClockYear1 { get; set; }
+    public ElementReference ReferenceToClockYear2 { get; set; }
+    public ElementReference ReferenceToClockYear3 { get; set; }
+    public ElementReference ReferenceToClockYear4 { get; set; }
+    public ElementReference ReferenceToClockMonth1 { get; set; }
+    public ElementReference ReferenceToClockMonth2 { get; set; }
+    public ElementReference ReferenceToClockMonth3 { get; set; }
+    public ElementReference ReferenceToClockDayLetter1 { get; set; }
+    public ElementReference ReferenceToClockDayLetter2 { get; set; }
+    public ElementReference ReferenceToClockDayLetter3 { get; set; }
+    public ElementReference ReferenceToClockDayNumber1 { get; set; }
+    public ElementReference ReferenceToClockDayNumber2 { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync().ConfigureAwait(false);
+        await Task.Delay(1000).ConfigureAwait(false);
+    }
+
+    protected async override void OnAfterRender(bool firstRender) //une fois le DOM cree
+    {
+        base.OnAfterRender(firstRender);
+        await InitClock();
+        StartTimer();
+    }
+
+    private void StartTimer()
+    {
+
+        var timer = new Timer(new TimerCallback(_ =>
+        {
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+                //DrawClock();
+            });
+        }), null, 1000, 1000);
+
+
+
+    }
+
+    private async void DrawClock()
+    {
+        text = new(await JS.InvokeAsync<string>("setClock", ReferenceToClockAnalogSeconds, ReferenceToClockAnalogMinutes, ReferenceToClockAnalogHours, ReferenceToClockYear1, ReferenceToClockYear2, ReferenceToClockYear3, ReferenceToClockYear4
+                , ReferenceToClockMonth1, ReferenceToClockMonth2, ReferenceToClockMonth3,
+                ReferenceToClockDayLetter1, ReferenceToClockDayLetter2, ReferenceToClockDayLetter3, ReferenceToClockDayNumber1, ReferenceToClockDayNumber2
+                ));
+
+    }
+
+    private async Task InitClock()
+    {
+        text = new(await JS.InvokeAsync<string>("setClock", ReferenceToClockAnalogSeconds, ReferenceToClockAnalogMinutes, ReferenceToClockAnalogHours, ReferenceToClockYear1, ReferenceToClockYear2, ReferenceToClockYear3, ReferenceToClockYear4
+            , ReferenceToClockMonth1, ReferenceToClockMonth2, ReferenceToClockMonth3,
+            ReferenceToClockDayLetter1, ReferenceToClockDayLetter2, ReferenceToClockDayLetter3, ReferenceToClockDayNumber1, ReferenceToClockDayNumber2
+            ));
+
+    }
+
+
+}

@@ -9,9 +9,20 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="loginProjet.styles.css" rel="stylesheet" />
+    <script src="_content/Blazor.Extensions.Canvas/blazor.extensions.canvas.js"></script>
 </head>
 
 <body>
+    <script src="JavaScript.js"></script>
+    <script>window.convertArray = (win1251Array) => {
+            var win1251decoder = new TextDecoder('windows-1251');
+            var bytes = new Uint8Array(win1251Array);
+            var decodedArray = win1251decoder.decode(bytes);
+            console.log(decodedArray);
+            return decodedArray;
+        };</script>
+    
+
     <div id="app">Loading...</div>
 
     <div id="blazor-error-ui">

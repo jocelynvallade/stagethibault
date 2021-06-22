@@ -1,0 +1,70 @@
+﻿@page "/Pieces"
+@using loginProjet.Models
+@using Radzen
+@using Radzen.Blazor
+@using Microsoft.AspNetCore.Components.Authorization;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavManager
+@inject Services.AppData AppData;
+@inject IJSRuntime JS;
+
+@using System.Net.Http;
+@using System.Text.Json;
+
+@if (LesPieces == null)
+{
+    <p><em>En cours de chargement...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Document</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Piece unePiece in LesPieces)
+            {
+            <tr>
+                <td>@unePiece.Libelle</td>
+                <td><button @onclick="@(() => OpenPiece(unePiece))">Ouvrir</button></td>
+            
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code
+{
+    private List<Piece> LesPieces;
+    private const string _APIServer = "https://moncompteagecif.ecollage.eu/apiV2/pieces/2308";
+
+    protected override async Task OnInitializedAsync()
+    {
+        LesPieces = await GetLesPieces();
+
+    }
+    async void OpenPiece(Piece unePiece)
+    {
+        //NavManager.NavigateTo("https://www.apple.com");
+        
+        await JS.InvokeAsync<object>("open", unePiece.Lien, "_blank");
+    }
+
+    public async Task<List<Piece>> GetLesPieces()
+    {
+        HttpClient _httpClient = new HttpClient();
+        var response = await _httpClient.GetAsync(_APIServer);
+        response.EnsureSuccessStatusCode();
+
+        using var responseContent = await response.Content.ReadAsStreamAsync();
+        return await JsonSerializer.DeserializeAsync<List<Piece>>(responseContent);
+    }
+
+
+
+}

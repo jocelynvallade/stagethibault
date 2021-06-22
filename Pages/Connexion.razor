@@ -1,67 +1,81 @@
-﻿@page "/Connexion"
+﻿@page "/connexionold"
 
 
 @using Microsoft.AspNetCore.Components;
 @using System.Security.Claims;
 @using System.Collections.Generic;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Services;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavManager
+@inject Services.AppData AppData;
 
 @using System.Text.Json;
 @inject NavigationManager NavManager
-    <div class="back">
-        <div class="container">
-            <div class="box">
-                <h1 align="center">Connexion</h1>
+<a href="/Todo">Go to Page 2</a>
+
+<div class="back">
+    <div class="container">
+        <div class="box">
+            <h1 align="center">Connexion</h1>
 
 
-                Nom:
-                <input class="name" type="text" placeholder="Nom" @bind="@username" />
+            Nom:
+            <input class="name" type="text" placeholder="Nom" @bind="@username" />
+
+            Mot de passe:
+            <input class="pass" type="password" placeholder="Mot de passe" @bind="@password" />
 
 
 
-                Mot de passe:
-                <input class="pass" type="password" placeholder="Mot de passe" @bind="@password" />
+            <button class="btn btn-primary" @onclick="TryLogin">Se connecter</button>
+            <span class="text-danger">@loginErrorMessage</span>
 
-
-
-                <button class="btn btn-primary" @onclick="TryLogin">Se connecter</button>
-                <span class="text-danger">@loginErrorMessage</span>
-
-            </div>
         </div>
     </div>
+</div>
 
 
-    @code { private class Utilisateur
-        {
-            public string Nom { get; set; }
-            public string Mdp { get; set; }
-        }
+@code {
+    protected override void OnInitialized()
+    {
+        AppData.OnChange += StateHasChanged;
+    }
 
 
-        private List<Utilisateur> Utilisateurs = new List<Utilisateur>()
+    private class Utilisateur
+    {
+        public string Nom { get; set; }
+        public string Mdp { get; set; }
+    }
+
+
+    private List<Utilisateur> Utilisateurs = new List<Utilisateur>()
 {
         new Utilisateur { Nom = "Jocelyn", Mdp = "aze122" },
         new Utilisateur { Nom = "Thibault", Mdp = "brt?" }
     };
 
+    string username = "";
+    string password = "";
+    string loginErrorMessage = "";
 
-
-        string username = "";
-        string password = "";
-        string loginErrorMessage = "";
-
-        public void TryLogin()
+    public async void TryLogin()
+    {
+        Utilisateur result = Utilisateurs.Find(x => x.Nom == username);
+        if (result == null)
+            loginErrorMessage = "Je ne vous connais pas";
+        else
+            if (result.Mdp == password)
         {
-            Utilisateur result = Utilisateurs.Find(x => x.Nom == username);
-            if (result == null)
-                loginErrorMessage = "Je ne vous connais pas";
-            else
-                if (result.Mdp == password)
-            {
-                loginErrorMessage = "Bienvenue " + result.Nom;
-                NavManager.NavigateTo("/todo");
-            }
-            else
-                loginErrorMessage = "Mot de passe incorrect ";
+            AppData.Username = username;
+            AppData.CanLogin = true;
+            await localStorage.SetItemAsync<string>("username", result.Nom);
+            await AuthProvider.GetAuthenticationStateAsync();
+            NavManager.NavigateTo("Todo", true);
+        }
+        else
+            loginErrorMessage = "Mot de passe incorrect ";
 
-        } }
+    } }
